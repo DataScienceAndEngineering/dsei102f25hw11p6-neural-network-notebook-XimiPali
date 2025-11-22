@@ -1,0 +1,28 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: jupyter notebook test
+      id: jupyter-notebook-test
+      uses: classroom-resources/autograding-python-grader@v1
+      with:
+        timeout: 30
+        max-score: 20
+        setup-command: ''
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        JUPYTER-NOTEBOOK-TEST_RESULTS: "${{steps.jupyter-notebook-test.outputs.result}}"
+      with:
+        runners: jupyter-notebook-test
